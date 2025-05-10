@@ -195,36 +195,51 @@ public class CatalogRegister {
     }
   }
 
-  // 檢查目錄是否存在
+
+  // 檢查目錄是否存在：檢查 Trino 中是否存在指定名稱的目錄（catalog）
   private boolean checkCatalogExist(String name) {
+    // 構建 SQL 查詢命令，使用 LIKE 來模糊匹配目錄名稱
     String showCatalogCommand = String.format("SHOW CATALOGS like '%s'", name);
     Exception failedException = null;
     try {
-      int retries = EXECUTE_QUERY_MAX_RETRIES;
-      while (retries-- > 0) {
-        try (Statement statement = connection.createStatement()) {
-          // check the catalog is already created
-          statement.execute(showCatalogCommand);
-          ResultSet rs = statement.getResultSet();
-          while (rs.next()) {
-            String catalogName = rs.getString(1);
-            if (catalogName.equals(name) || catalogName.equals("\"" + name + "\"")) {
-              return true;
+        // 設置重試次數
+        int retries = EXECUTE_QUERY_MAX_RETRIES;
+        while (retries-- > 0) {
+            try (Statement statement = connection.createStatement()) {
+                // 執行查詢命令
+                statement.execute(showCatalogCommand);
+                ResultSet rs = statement.getResultSet();
+                // 遍歷結果集
+                while (rs.next()) {
+                    String catalogName = rs.getString(1);
+                    // 檢查目錄名稱是否匹配（考慮帶引號和不帶引號的情況）
+                    if (catalogName.equals(name) || catalogName.equals("\"" + name + "\"")) {
+                        return true;
+                    }
+                }
+                return false;
+            } catch (Exception e) {
+                // 記錄失敗的異常
+                failedException = e;
+                LOG.warn("Execute command failed: {}, ", showCatalogCommand, e);
+                // 等待一段時間後重試
+                Thread.sleep(EXECUTE_QUERY_BACKOFF_TIME_SECOND * 1000);
             }
-          }
-          return false;
-        } catch (Exception e) {
-          failedException = e;
-          LOG.warn("Execute command failed: {}, ", showCatalogCommand, e);
-          Thread.sleep(EXECUTE_QUERY_BACKOFF_TIME_SECOND * 1000);
         }
-      }
-      throw failedException;
+        // 如果重試次數用完仍然失敗，拋出最後一次失敗的異常
+        throw failedException;
     } catch (Exception e) {
-      throw new TrinoException(
-          GravitinoErrorCode.GRAVITINO_RUNTIME_ERROR, "Failed to check catalog exist", e);
+        // 將異常包裝為 TrinoException 並拋出
+        throw new TrinoException(
+            GravitinoErrorCode.GRAVITINO_RUNTIME_ERROR, 
+            "Failed to check catalog exist", 
+            e);
     }
   }
+  // [系統設計] 為什麼這段程式碼使用 JDBC 而不是更高階的 API？
+  // 使用 JDBC 是因為 Trino 的 JDBC 驅動程式是唯一能夠在 Trino 中執行 SQL 語句的驅動程式。
+  // 其他更高階的 API，可能無法在 Trino 中執行 SQL 語句。
+  // 使用 JDBC 是因為 Trino 的 JDBC 驅動程式是唯一能夠在 Trino 中執行 SQL 語句的驅動程式。
 
   private void executeSql(String sql) {
     try {
