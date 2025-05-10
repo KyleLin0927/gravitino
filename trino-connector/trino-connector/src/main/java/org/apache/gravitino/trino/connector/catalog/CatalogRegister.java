@@ -43,6 +43,8 @@ import org.slf4j.LoggerFactory;
  * This class dynamically register the Catalog managed by Apache Gravitino into Trino using Trino
  * CREATE CATALOG statement. It allows the catalog to be used in Trino like a regular Trino catalog.
  */
+// [業務邏輯] 主要用於在 Trino 中動態註冊由 Apache Gravitino 管理的目錄（Catalog）。
+// 得 Gravitino 管理的目錄可以在 Trino 中像普通 Trino 目錄一樣使用。它提供了完整的目錄生命週期管理功能，包括註冊、取消註冊和狀態檢查。
 public class CatalogRegister {
 
   private static final Logger LOG = LoggerFactory.getLogger(CatalogRegister.class);
@@ -60,6 +62,7 @@ public class CatalogRegister {
   private String catalogStoreDirectory;
   private GravitinoConfig config;
 
+  // 版本相容性檢查
   private void checkTrinoSpiVersion(ConnectorContext context) {
     this.trinoVersion = context.getSpiVersion();
 
@@ -75,6 +78,7 @@ public class CatalogRegister {
     isCoordinator = context.getNodeManager().getCurrentNode().isCoordinator();
   }
 
+  // 檢查 Trino 版本是否支持帶有金礦的目錄名稱
   private void checkSupportCatalogNameWithMetalake(
       ConnectorContext context, GravitinoConfig config) {
     if (!config.simplifyCatalogNames()) {
@@ -108,6 +112,7 @@ public class CatalogRegister {
     }
   }
 
+  // 初始化方法
   public void init(ConnectorContext context, GravitinoConfig config) throws Exception {
     this.config = config;
     checkTrinoSpiVersion(context);
@@ -138,6 +143,7 @@ public class CatalogRegister {
     }
   }
 
+  // 生成創建目錄的 SQL 命令
   private String generateCreateCatalogCommand(String name, GravitinoCatalog gravitinoCatalog)
       throws Exception {
     return String.format(
@@ -153,6 +159,8 @@ public class CatalogRegister {
     return String.format("DROP CATALOG %s", name);
   }
 
+  // 目錄管理功能
+  // 註冊目錄
   public void registerCatalog(String name, GravitinoCatalog catalog) {
     try {
       String catalogFileName = String.format("%s/%s.properties", catalogStoreDirectory, name);
@@ -187,6 +195,7 @@ public class CatalogRegister {
     }
   }
 
+  // 檢查目錄是否存在
   private boolean checkCatalogExist(String name) {
     String showCatalogCommand = String.format("SHOW CATALOGS like '%s'", name);
     Exception failedException = null;
@@ -242,6 +251,7 @@ public class CatalogRegister {
     }
   }
 
+  // 取消註冊目錄
   public void unregisterCatalog(String name) {
     try {
       if (!checkCatalogExist(name)) {
