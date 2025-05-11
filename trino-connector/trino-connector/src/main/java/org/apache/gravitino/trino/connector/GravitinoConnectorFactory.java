@@ -41,6 +41,18 @@ import org.apache.gravitino.trino.connector.system.table.GravitinoSystemTableFac
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/*
+
+[系統邏輯] 連接器工廠，支持多種連接器類型：
+  - Hive
+  - Iceberg
+  - Memory
+  - MySQL
+  - PostgreSQL
+  - Trino Cluster
+
+*/
+
 public class GravitinoConnectorFactory implements ConnectorFactory {
 
   private static final Logger LOG = LoggerFactory.getLogger(GravitinoConnectorFactory.class);

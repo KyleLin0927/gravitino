@@ -39,6 +39,19 @@ import org.apache.gravitino.trino.connector.metadata.GravitinoCatalog;
  * Support trino cluster connector. Transforming cluster connector configuration and components into
  * Gravitino connector.
  */
+
+/*
+
+[系統邏輯] 目錄連接器 adapter：CatalogConnectorAdapter 介面定義目錄連接器的基本行為
+
+主要實現包括：
+HiveConnectorAdapter：Hive 連接器適配器
+IcebergConnectorAdapter：Iceberg 連接器適配器
+MySQLConnectorAdapter：MySQL 連接器適配器
+PostgreSQLConnectorAdapter：PostgreSQL 連接器適配器
+TrinoClusterConnectorAdapter：Trino 集群連接器適配器
+
+*/
 public class TrinoClusterConnectorAdapter implements CatalogConnectorAdapter {
 
   private static final String CONNECTOR_CLUSTER = "trino";

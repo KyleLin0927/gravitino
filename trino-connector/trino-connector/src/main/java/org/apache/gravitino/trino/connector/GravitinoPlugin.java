@@ -22,6 +22,16 @@ import com.google.common.collect.ImmutableList;
 import io.trino.spi.Plugin;
 import io.trino.spi.connector.ConnectorFactory;
 
+/*[業務邏輯] Trino 插件的入口點，使用 Java SPI (Service Provider Interface) 機制實現
+* GravitinoConnectorFactory：負責創建連接器，是連接器的主要工廠類
+* Trino 使用這個工廠創建連接器 
+* 主要組件：
+  GravitinoPlugin：插件入口點
+  GravitinoConnectorFactory：連接器工廠
+  GravitinoConnector：實際的連接器實現：Trino 和 Gravitino 之間操作的主要入口點
+  CatalogConnectorAdapter：不同數據源的適配器
+*/
+
 /** Trino plugin endpoint, using java spi mechanism */
 public class GravitinoPlugin implements Plugin {
 

@@ -52,6 +52,12 @@ import org.apache.gravitino.trino.connector.system.table.GravitinoSystemTableFac
  * through Trino catalog configuration, a GravitinoSystemConnector is initially created. And it
  * provides some system tables and stored procedures of Gravitino connector.
  */
+
+// GravitinoSystemConnector：
+// 主要用於驅動 GravitinoCatalogManager 加載在 Gravitino 伺服器中管理的連接器
+// 在用戶通過 Trino 目錄配置配置 Gravitino 連接器後，會初始化 GravitinoSystemConnector
+// 並提供 Gravitino 連接器的系統表和存儲過程
+
 public class GravitinoSystemConnector implements Connector {
 
   private final GravitinoStoredProcedureFactory gravitinoStoredProcedureFactory;
