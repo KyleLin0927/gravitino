@@ -38,6 +38,7 @@ plugins {
   id("java")
   id("idea")
   id("jacoco")
+  id("org.sonarqube") version "4.4.1.3373"
   alias(libs.plugins.gradle.extensions)
   alias(libs.plugins.node) apply false
 
@@ -1018,6 +1019,17 @@ fun checkOrbStackStatus() {
     }
   } catch (e: IOException) {
     println("checkOrbStackStatus failed: ${e.message}")
+  }
+}
+
+sonarqube {
+  properties {
+    property("sonar.projectKey", "my-gravitino-project")
+    property("sonar.projectName", "my-gravitino-project")
+    property("sonar.host.url", "http://localhost:9001")
+    property("sonar.login", "squ_a33eb8936b83e5642bf09761351fb90ca56f0054")
+    property("sonar.java.binaries", "build")
+    property("sonar.gradle.skipCompile", "true")
   }
 }
 

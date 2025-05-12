@@ -1,0 +1,51 @@
+# .semgrep.yml
+rules:
+
+  # 1) JDBC API 用字串相加造 SQL
+  - id: java-sql-injection-jdbc-concat
+    languages: [java]
+    severity: ERROR
+    message: "Possible SQL Injection: concatenated string passed to JDBC API"
+    metadata:
+      category: security
+      cwe: "CWE-89"
+    patterns:
+      - pattern: $STMT.executeQuery($SQL + $ARGS)
+      - pattern: $STMT.executeUpdate($SQL + $ARGS)
+      - pattern: $STMT.prepareStatement($SQL + $ARGS)
+
+  # 2) JDBC API 用 String.format 造 SQL
+  - id: java-sql-injection-jdbc-format
+    languages: [java]
+    severity: ERROR
+    message: "Possible SQL Injection: String.format passed to JDBC API"
+    metadata:
+      category: security
+      cwe: "CWE-89"
+    patterns:
+      - pattern: $STMT.executeQuery(String.format($FMT, ...))
+      - pattern: $STMT.executeUpdate(String.format($FMT, ...))
+      - pattern: $STMT.prepareStatement(String.format($FMT, ...))
+
+  # 3) 自訂 sql(...) helper 用字串相加造 SQL
+  - id: java-sql-injection-sqlwrapper-concat
+    languages: [java]
+    severity: ERROR
+    message: "Possible SQL Injection: concatenated string passed to sql(...) helper"
+    metadata:
+      category: security
+      cwe: "CWE-89"
+    patterns:
+      - pattern: sql($SQL + $ARGS)
+
+  # 4) 自訂 sql(...) helper 用 String.format 造 SQL
+  - id: java-sql-injection-sqlwrapper-format
+    languages: [java]
+    severity: ERROR
+    message: "Possible SQL Injection: String.format passed to sql(...) helper"
+    metadata:
+      category: security
+      cwe: "CWE-89"
+    patterns:
+      - pattern: sql(String.format($FMT, ...))
+
