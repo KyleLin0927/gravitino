@@ -16,14 +16,24 @@
 # specific language governing permissions and limitations
 # under the License.
 #
+
+# [系統邏輯] 這個 Dockerfile 用於構建 Gravitino 的 Docker 映像
+
+# 使用 openjdk:17-jdk-buster 作為基礎映像
 FROM openjdk:17-jdk-buster
+
+# 設定維護者
 LABEL maintainer="dev@gravitino.apache.org"
 
+# 設定工作目錄
 WORKDIR /root/gravitino
 
+# 複製 gravitino 的 packages 目錄到容器中
 COPY packages/gravitino /root/gravitino
 
+# 暴露 8090 和 9001 端口
 EXPOSE 8090
 EXPOSE 9001
 
+# 設定容器啟動時的入口點
 ENTRYPOINT ["/bin/bash", "/root/gravitino/bin/gravitino.sh", "start"]
