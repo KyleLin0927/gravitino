@@ -16,8 +16,14 @@
 # specific language governing permissions and limitations
 # under the License.
 
+# Python 的 os 模組提供了存取這些環境變數的介面
 import os
 
+# [系統邏輯] 這個腳本用於更新 Iceberg REST Server 的配置文件。
+# 這個腳本在 Docker 容器啟動時執行，用於根據環境變數動態生成 Iceberg REST Server 的配置文件。
+# 它會將環境變量中的值更新到配置文件中。
+
+# 這個腳本會將環境變量中的值更新到配置文件中。
 env_map = {
   "GRAVITINO_IO_IMPL" : "io-impl",
   "GRAVITINO_URI" : "uri",
@@ -50,6 +56,7 @@ env_map = {
 
 }
 
+# 這個變量用於初始化配置文件。
 init_config = {
   "catalog-backend" : "jdbc",
   "jdbc-driver" : "org.sqlite.JDBC",
@@ -60,7 +67,7 @@ init_config = {
   "jdbc.schema-version" : "V1"
 }
 
-
+# 這個函數用於解析配置文件。
 def parse_config_file(file_path):  
     config_map = {}  
     with open(file_path, 'r') as file:  
@@ -73,19 +80,31 @@ def parse_config_file(file_path):
                 config_map[key] = value  
     return config_map  
 
+# 這個變量用於更新配置文件。
 config_prefix = "gravitino.iceberg-rest."
 
+# 這個函數用於更新配置文件。
 def update_config(config, key, value):
     config[config_prefix + key] = value
-  
+
+# 這個變量用於更新配置文件。
 config_file_path = 'conf/gravitino-iceberg-rest-server.conf'
 config_map = parse_config_file(config_file_path)
+
+# 這部分的主要邏輯是：
+# 1. 讀取現有配置文件
+# 2. 應用預設配置
+# 3. 從環境變數中讀取配置並更新
+# 4. 刪除舊的配置文件
+# 5. 寫入新的配置文件
 
 for k, v in init_config.items():
     update_config(config_map, k, v)
 
+# # os.environ 是一個字典，包含了所有環境變數
+# 當我們使用 os.environ[k] 時，就是在讀取名為 k 的環境變數的值
 for k, v in env_map.items():
-    if k in os.environ:
+    if k in os.environ: 
         update_config(config_map, v, os.environ[k])
   
 if os.path.exists(config_file_path):  
